@@ -20,6 +20,9 @@ from pdb import set_trace
 class Solution(object):
     def reverseVowels_regular(self, s):
         """
+        My way of reversing only the vowels in the string
+
+        :param s: Input string
         :type s: str
         :rtype: str
         """
