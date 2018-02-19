@@ -25,7 +25,7 @@ class AllParanthesis:
 
     def solution_dprog(self, n):
         """
-        A dynamic programing solution
+        My dynamic programing solution
         :type n: int
         :rtype: List[str]
         """
