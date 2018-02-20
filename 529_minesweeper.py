@@ -54,9 +54,11 @@ Note:
 from pdb import set_trace
 
 class Solution(object):
-    def updateBoard(self, board, click):
+    def updateBoard_rdfs(self, board, click):
         """
-        A breadth first search approach.
+        A Recursive DFS approach. 
+        We use a for loop, that pick the first neighbor and explores it.
+        
         :type board: List[List[str]]
         :type click: List[int]
         :rtype: List[List[str]]
@@ -101,9 +103,62 @@ class Solution(object):
 
         return explore(board, row=click[0], col=click[1])
 
-    def updateBoard_dfs(self, board, click):
+
+    def updateBoard_nrbfs(self, board, click):
         """
-        A depth first search approach.
+        A non-recursive breadth first search approach. We must use queues. 
+        
+        Remember as 
+          - queues -> horizontal -> breadth
+          - stacks -> vertical -> depth
+        
+        :type board: List[List[str]]
+        :type click: List[int]
+        :rtype: List[List[str]]
+        """
+
+        def neighbors(row, col):
+            for r in [1, -1, 0]:
+                for c in [0, 1, -1]:
+                    if (0 <= row + r < len(board) and 0 <= col + c < len(
+                            board[0])) and (r or c):
+                        yield row + r, col + c
+
+        "Create an empty queue to hold the next cell to explore"
+        queue = deque()
+        seen = []
+        "If mine, just return board with 'X'"
+        if board[click[0]][click[1]] == "M":
+            board[click[0]][click[1]] = "X"
+            return board
+        else:
+            queue.extend([tuple(click)])
+            while len(queue):
+                row, col = queue.pop()  # We're using queues, so pick left.
+                seen.append((row, col))
+
+                "Find if there are mines in the viscinity"
+                board[row][col] = sum([int(board[r][c] == "M")
+                                       for r, c in neighbors(row, col)])
+
+                "If no. of mines is 0 then put 'B' else put the mine count"
+                board[row][col] = "B" if board[row][col] == 0 else board[row][col]
+
+                "Add all the neighbors of the cell to the queue"
+                queue.extendleft([(r, c) for r, c in neighbors(
+                    row, col) if (r, c) not in seen and board[r][c] == 'E'])
+
+            return board
+
+
+    def updateBoard_rbfs(self, board, click):
+        """
+        A recursive breadth first search approach. Uses queues recursively.
+        
+        Again, remember as:
+          - queues -> horizontal -> breadth
+          - stacks -> vertical -> depth
+
         :type board: List[List[str]]
         :type click: List[int]
         :rtype: List[List[str]]
@@ -125,7 +180,7 @@ class Solution(object):
 
         def explore(board, seen=[], next=queue):
 
-            (row, col) = next.pop()
+            (row, col) = next.popleft()
             if board[row][col] == "E":
                 "Add cell to explored"
                 seen += [(row, col)]
@@ -166,9 +221,23 @@ def _test():
              ['E', 'E', 'E', 'E', 'E'],
              ['E', 'E', 'E', 'E', 'E'],
              ['E', 'E', 'E', 'M', 'E'],
-             ['E', 'E', 'E', 'E', 'E']]
+             ['E', 'E', 'E', 'E', 'M']]
 
-    board_1 = s.updateBoard_dfs(board, click=[3,0])
+    print("Recursive DFS")
+    board_1 = s.updateBoard_rdfs(board, click=[3, 0])
+    for row in board:
+        print(row)
+
+    print("\n")
+    print("Recursive BFS")
+    board_1 = s.updateBoard_rbfs(board, click=[3,0])
+    for row in board:
+        print(row)
+
+    print("\n")
+    print("Non-Recursive BFS")
+    board_1 = s.updateBoard_nrbfs(board, click=[3, 0])
+    print(row)
     for row in board:
         print(row)
 
