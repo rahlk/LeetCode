@@ -52,6 +52,7 @@ Note:
 """
 
 from pdb import set_trace
+from collections import deque
 
 class Solution(object):
     def updateBoard_rdfs(self, board, click):
@@ -96,7 +97,7 @@ class Solution(object):
 
                 "Recurse on all the neighbors"
                 for r, c in neighbors(row, col):
-                    if not (r, c) in seen:
+                    if not (r, c) in seen and board[row][col] == "B":
                         board = explore(board, r, c, seen)
 
             return board
@@ -126,7 +127,6 @@ class Solution(object):
 
         "Create an empty queue to hold the next cell to explore"
         queue = deque()
-        seen = []
         "If mine, just return board with 'X'"
         if board[click[0]][click[1]] == "M":
             board[click[0]][click[1]] = "X"
@@ -135,7 +135,6 @@ class Solution(object):
             queue.extend([tuple(click)])
             while len(queue):
                 row, col = queue.pop()  # We're using queues, so pick left.
-                seen.append((row, col))
 
                 "Find if there are mines in the viscinity"
                 board[row][col] = sum([int(board[r][c] == "M")
@@ -146,7 +145,7 @@ class Solution(object):
 
                 "Add all the neighbors of the cell to the queue"
                 queue.extendleft([(r, c) for r, c in neighbors(
-                    row, col) if (r, c) not in seen and board[r][c] == 'E'])
+                    row, col) if board[row][col] == "B" and board[r][c] == 'E'])
 
             return board
 
@@ -202,7 +201,7 @@ class Solution(object):
                 This is the DFS part, since we use queues, 
                 the next neighbors are dequeued leading to a dfs
                 """
-                next.extend([(r,c) for r, c in neighbors(row, col) if board[r][c]=="E"])
+                next.extend([(r,c) for r, c in neighbors(row, col) if board[r][c]=="E" and board[row][col]=="B"])
                 
                 board = explore(board, seen, next)
 
@@ -215,13 +214,9 @@ class Solution(object):
 def _test():
     s = Solution()
     board = [['E', 'E', 'E', 'E', 'E'],
-             ['E', 'M', 'E', 'E', 'E'],
-             ['E', 'E', 'E', 'E', 'E'],
              ['E', 'E', 'M', 'E', 'E'],
              ['E', 'E', 'E', 'E', 'E'],
-             ['E', 'E', 'E', 'E', 'E'],
-             ['E', 'E', 'E', 'M', 'E'],
-             ['E', 'E', 'E', 'E', 'M']]
+             ['E', 'E', 'E', 'E', 'E']]
 
     print("Recursive DFS")
     board_1 = s.updateBoard_rdfs(board, click=[3, 0])
