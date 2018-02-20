@@ -201,7 +201,7 @@ def _test():
              ['E', 'E', 'E', 'M', 'E'],
              ['E', 'E', 'E', 'E', 'E']]
 
-    board_1 = s.updateBoard_dfs(board, click=[3, 0])
+    board_1 = s.updateBoard(board, click=[3, 0])
     for row in board:
         print(row)
 
